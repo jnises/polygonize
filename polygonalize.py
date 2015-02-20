@@ -3,6 +3,7 @@
 import sys
 import tifffile
 import numpy as np
+import itertools
 
 diagonal = ((0, 0, 0), (1, 1, 1))
 tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
@@ -15,7 +16,7 @@ tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
 def get_polygon(cube, isovalue):
     inside = cube > isovalue
     for t in tetrahedrons:
-        for start, end in ((start, end) for start in t for end in t if start != end):
+        for start, end in itertools.combinations(t, 2):
             if inside[start] != inside[end]:
                 delta = np.array(end) - np.array(start)
                 # do something more clever than 0.5
@@ -39,8 +40,12 @@ def polygonalize(indata, outfile, isovalue):
     sys.stdout.write('\n')
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        sys.exit('usage: {} infile outfile'.format(sys.argv[0]))
-    indata = tifffile.imread(sys.argv[1])
-    with open(sys.argv[2], 'w') as outfile:
-        polygonalize(indata, outfile, 0.01)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('infile')
+    parser.add_argument('outfile')
+    parser.add_argument('--isovalue', default = 0.5, type = float)
+    args = parser.parse_args()
+    indata = tifffile.imread(args.infile)
+    with open(args.outfile, 'w') as outfile:
+        polygonalize(indata, outfile, args.isovalue)
