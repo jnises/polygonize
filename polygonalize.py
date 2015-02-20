@@ -35,7 +35,7 @@ def polygonalize(indata, outfile, isovalue):
                         outfile.write('v {} {} {}\n'.format(*vertex))
                     if len(polygon):
                         outfile.write('f {}\n'.format(' '.join((str(a) for a in -1 - np.arange(len(polygon))))))
-        sys.stdout.write('\r{}/{}'.format(z, indata.shape[0]))
+        sys.stdout.write('\r{}/{}'.format(z + 1, indata.shape[0] - 1))
     sys.stdout.write('\n')
 
 if __name__ == '__main__':
@@ -43,4 +43,4 @@ if __name__ == '__main__':
         sys.exit('usage: {} infile outfile'.format(sys.argv[0]))
     indata = tifffile.imread(sys.argv[1])
     with open(sys.argv[2], 'w') as outfile:
-        polygonalize(indata, outfile, 0.1)
+        polygonalize(indata, outfile, 0.01)
