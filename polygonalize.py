@@ -6,7 +6,7 @@ author: Joel Nises
 '''
 
 import sys
-import tifffile
+import h5py
 import numpy as np
 import itertools
 
@@ -50,6 +50,5 @@ if __name__ == '__main__':
     parser.add_argument('outfile')
     parser.add_argument('--isovalue', default = 0.5, type = float)
     args = parser.parse_args()
-    indata = tifffile.imread(args.infile)
-    with open(args.outfile, 'w') as outfile:
-        polygonalize(indata, outfile, args.isovalue)
+    with h5py.File(args.infile, 'r') as infile, open(args.outfile, 'w') as outfile:
+        polygonalize(list(infile.values())[0], outfile, args.isovalue)
