@@ -9,6 +9,7 @@ import sys
 import h5py
 import numpy as np
 import itertools
+import tifffile
 
 diagonal = ((0, 0, 0), (1, 1, 1))
 tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
@@ -50,5 +51,15 @@ if __name__ == '__main__':
     parser.add_argument('outfile')
     parser.add_argument('--isovalue', default = 0.5, type = float)
     args = parser.parse_args()
-    with h5py.File(args.infile, 'r') as infile, open(args.outfile, 'w') as outfile:
-        polygonalize(list(infile.values())[0], outfile, args.isovalue)
+    infile = None
+    if args.infile.endswith('.hdf5'):
+        infile = h5py.File(args.infile, 'r')
+        indata = list(infile.values())[0]
+    else:
+        indata = tifffile.imread(args.infile)
+    try:
+        with open(args.outfile, 'w') as outfile:
+            polygonalize(indata, outfile, args.isovalue)
+    finally:
+        if infile:
+            infile.close()
