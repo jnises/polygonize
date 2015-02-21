@@ -22,8 +22,14 @@ tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
 def get_polygons(cube, isovalue):
     inside = cube > isovalue
     for t in tetrahedrons:
-        # do something more clever than 0.5
-        polygon = [(np.array(start) + (np.array(end) - np.array(start)) * 0.5) for start, end in itertools.combinations(t, 2) if inside[start] != inside[end]]
+        polygon = []
+        for start, end in itertools.combinations(t, 2):
+            if inside[start] != inside[end]:
+                if cube[start] < cube[end]:
+                    value = (isovalue - cube[start]) / (cube[end] - cube[start])
+                else:
+                    value = 1 - (isovalue - cube[end]) / (cube[start] - cube[end])
+                polygon.append(np.array(start) + (np.array(end) - np.array(start)) * value)
         if len(polygon):
             yield polygon
 
