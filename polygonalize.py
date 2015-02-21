@@ -21,12 +21,8 @@ tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
 def get_polygons(cube, isovalue):
     inside = cube > isovalue
     for t in tetrahedrons:
-        polygon = []
-        for start, end in itertools.combinations(t, 2):
-            if inside[start] != inside[end]:
-                delta = np.array(end) - np.array(start)
-                # do something more clever than 0.5
-                polygon.append(np.array(start) + delta * 0.5)
+        # do something more clever than 0.5
+        polygon = [(np.array(start) + (np.array(end) - np.array(start)) * 0.5) for start, end in itertools.combinations(t, 2) if inside[start] != inside[end]]
         if len(polygon):
             yield polygon
 
@@ -39,9 +35,9 @@ def polygonalize(indata, outfile, isovalue):
                 cube = indata[z: z + 2, y: y + 2, x: x + 2].astype(float) / np.iinfo(indata.dtype).max
                 insidecube = cube > isovalue
                 if insidecube.any() and np.logical_not(insidecube).any():
-                    for polygon in (a + np.array((x, y, z)) for a in get_polygons(cube, isovalue)):
+                    for polygon in (a + np.array((z, y, x)) for a in get_polygons(cube, isovalue)):
                         for vertex in polygon:
-                            outfile.write('v {} {} {}\n'.format(*vertex))
+                            outfile.write('v {} {} {}\n'.format(vertex[2], vertex[1], vertex[0]))
                         if len(polygon):
                             outfile.write('f {}\n'.format(' '.join((str(a) for a in -1 - np.arange(len(polygon))))))
         sys.stdout.write('\r{}/{}'.format(z + 1, indata.shape[0] - 1))
