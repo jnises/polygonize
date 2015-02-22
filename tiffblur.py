@@ -2,7 +2,7 @@
 
 import tifffile
 import numpy as np
-import scipy.ndimage.interpolation
+import scipy.ndimage.filters
 import argparse
 
 if __name__ == '__main__':
@@ -13,4 +13,4 @@ if __name__ == '__main__':
     p.add_argument('-y', default = 1, type = float)
     p.add_argument('-z', default = 1, type = float)
     args = p.parse_args()
-    tifffile.imsave(args.outfile, scipy.ndimage.interpolation.zoom(tifffile.imread(args.infile), (args.z, args.y, args.x)))
+    tifffile.imsave(args.outfile, scipy.ndimage.filters.gaussian_filter(tifffile.imread(args.infile), (args.z, args.y, args.x)))
