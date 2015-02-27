@@ -6,10 +6,8 @@ author: Joel Nises
 '''
 
 import sys
-import h5py
 import numpy as np
 import itertools
-import tifffile
 
 _optimize = False
 if _optimize:
@@ -22,6 +20,7 @@ if _optimize:
 else:
     def jit(func):
         return func
+
 diagonal = ((0, 0, 0), (1, 1, 1))
 tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
                                        ((0, 1, 0), (1, 1, 0)),
@@ -106,9 +105,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     infile = None
     if args.infile.endswith('.hdf5'):
+        import h5py
         infile = h5py.File(args.infile, 'r')
         indata = list(infile.values())[0]
     else:
+        import tifffile
         indata = tifffile.imread(args.infile)
     try:
         with open(args.outfile, 'w') as outfile:
