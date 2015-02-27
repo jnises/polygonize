@@ -10,13 +10,18 @@ import h5py
 import numpy as np
 import itertools
 import tifffile
-try:
-    from numba import jit
-except ImportError:
-    sys.stderr.write('unable to import numba, things will be slow\n')
+
+_optimize = False
+if _optimize:
+    try:
+        from numba import jit
+    except ImportError:
+        sys.stderr.write('unable to import numba, things will be slow\n')
+        def jit(func):
+            return func
+else:
     def jit(func):
         return func
-
 diagonal = ((0, 0, 0), (1, 1, 1))
 tetrahedrons = [x + diagonal for x in (((0, 0, 1), (1, 0, 1)),
                                        ((0, 1, 0), (1, 1, 0)),
