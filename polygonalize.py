@@ -91,7 +91,7 @@ def polygonalize(indata, outfile, isovalue):
         for vertex in vertices:
             outfile.write('v {} {} {}\n'.format(vertex[2], vertex[1], vertex[0] + z))
         for face in faces:
-            outfile.write('f {}\n'.format(' '.join((str(vertexnumber - a) for a in range(face.shape[0])))))
+            outfile.write('f {}\n'.format(' '.join((str(a + vertexnumber) for a in face))))
         vertexnumber += len(vertices)
         sys.stdout.write('\r{}/{}'.format(z + 1, indata.shape[0] - 1))
     sys.stdout.write('\n')
